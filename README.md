@@ -23,7 +23,7 @@ By David Rose
 
 The lens of every came increases a slight portion of distortion within the images it captures, especially around the corners. Using a printed chessboard image and then tracking the corners with a function from OpenCV, the image can be transformed slightly to straighten out the lines, and then apply that transformation to subsequent images of the camera. Below is an example of image un-distortion:
 
- ![alt text](HiFi-Lane-Tracking/media/writeup_images/1.png)
+ ![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/1.png)
  
 ## Pipeline
 
@@ -31,11 +31,11 @@ The lens of every came increases a slight portion of distortion within the image
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one: (colors inverted from original)
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/2.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/2.png)
 
 ####
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/3.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/3.png)
 
 ### 2. Color transformation and thresholding
 
@@ -54,8 +54,8 @@ To perform the warping transform requires a bit of manual work. You have to iden
 
 #### Sobel transformation code block
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/4.png)
-![alt text](HiFi-Lane-Tracking/media/writeup_images/5.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/4.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/5.png)
 
 ### 4. Sliding Window Detection
 
@@ -67,7 +67,7 @@ The code (provided within a lesson in this project section) is a bit too long an
 
 ####
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/6.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/6.png)
 
 In the image above you can see the left/right borders of the sliding windows (though I am not sure why the horizontal lines keep disappearing) and the fitted yellow lines.
 
@@ -75,13 +75,13 @@ In the image above you can see the left/right borders of the sliding windows (th
 
 Once I have these lines digital lines fitted over the image of lane lines, I can use another OpenCV function to fill in a polygon and &#39;draw&#39; a virtual lane into the birds-eye image. This function, fillPoly creates a basic polygon on a blank image, then I can use the addWeighted function to overlay it (with transparency) on to the original lane image, by first placing it on birds-eye then warping back to original.
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/7.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/7.png)
 
 ### 6. Final image of lane plotted back on to the video feed, with detected lane line curves overlayed onto the image, along with the curves printed in the top-left corner.
 
 Steps 514 to 518 show where I used overlay both the virtual lane lines, and then the text for curve values, to the image for the video pipeline.
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/8.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/8.png)
 
 
 ## Video Result
@@ -98,7 +98,7 @@ Variables hold the positional history for both lanes and if the current detected
 
 This was key in helping to create a smooth detected lane in video. The possible downside is turns such as 90 degree turn or hairpin turns may be too sharp for the function to handle, considering it an error. But for this purpose we are just driving on a highway which has maximum curvature requirements that will not cause any issues here.
 
-![alt text](HiFi-Lane-Tracking/media/writeup_images/9.png)
+![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/9.png)
 
 ### 2. Future considerations
 
