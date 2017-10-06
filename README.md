@@ -6,7 +6,7 @@ By David Rose
 
 ## Lane Identification and tracking for autonomous vehicle video feeds
 
-### Following areas of this project include
+### Following steps include
 
 - Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
 - Apply a distortion correction to raw images.
@@ -61,7 +61,7 @@ To perform the warping transform requires a bit of manual work. You have to iden
 
 Breaking up the image height-wise into a series of sliding windows I can continually find the pixel locations and begin to mark the lane locations. In the below image you can see the result of this effort. Though there were some issues drawing the window rectangles, it performed well enough in practice. It uses a total of 9 windows on each lane to then track midpoint concentration of pixels, to best fit the lane line.
 
-The code (provided within a lesson in this project section) is a bit too long and extensive to post here in the write-up, but it can be found in the function sliding\_window on lines 231 to 422.
+The code is a bit too long and extensive to post here in the write-up, but it can be found in the function sliding\_window on lines 231 to 422.
 
 #### Sliding Windows on lane lines
 
