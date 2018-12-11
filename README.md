@@ -30,8 +30,43 @@ The lens of every came increases a slight portion of distortion within the image
 ### 1. Un-Distort and Warp the Perspective
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one: (colors inverted from original)
+```python
+def toDistort(img,mtx,dist,plot='no'):
+    global undist
+    undist = cv2.undistort(img, mtx, dist, None, mtx)
+    
+    if plot == 'yes':
+        plt.suptitle('Before Distortion', fontsize=14, fontweight='bold')
+        plt.imshow(img)
+        plt.show()
+        plt.suptitle('After Distortion', fontsize=14, fontweight='bold')
+        plt.imshow(undist)
+        plt.show()
+    return undist
 
-![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/2.png)
+        
+def toWarp(img,src,dst,undist,plot='no'):     
+    # Grab the image shape
+    global img_size
+    img_size = (toGray(img).shape[1], toGray(img).shape[0])
+
+
+    #print(np.shape(gray))
+    # Given src and dst points, calculate the perspective transform matrix
+    M = cv2.getPerspectiveTransform(src, dst)
+    # Warp the image using OpenCV warpPerspective()
+    global warped
+    warped = cv2.warpPerspective(img, M, img_size)
+    
+    if plot == 'yes':
+        plt.suptitle('Before Transformed', fontsize=14, fontweight='bold')
+        plt.imshow(img)
+        plt.show()
+        plt.suptitle('After Transformed', fontsize=14, fontweight='bold')
+        plt.imshow(warped)
+        plt.show()
+    #return warped
+```
 
 ####
 
@@ -53,8 +88,32 @@ To perform the warping transform requires a bit of manual work. You have to iden
 | 0, 720 | 0, 720 |
 
 #### Sobel transformation code block
+```python
+def toMagSobel(img, sobel_kernel=3, mag_thresh=(0, 255), plot='no'):
+    # Convert to grayscale
+    if len(np.shape(img)) > 2:
+        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    else:
+        gray = img
+    # Take both Sobel x and y gradients
+    sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
+    sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
+    # Calculate the gradient magnitude
+    gradmag = np.sqrt(sobelx**2 + sobely**2)
+    # Rescale to 8 bit
+    scale_factor = np.max(gradmag)/255 
+    gradmag = (gradmag/scale_factor).astype(np.uint8) 
+    # Create a binary image of ones where threshold is met, zeros otherwise
+    binary_output = np.zeros_like(gradmag)
+    binary_output[(gradmag >= mag_thresh[0]) & (gradmag <= mag_thresh[1])] = 1
 
-![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/4.png)
+    if plot == 'yes':
+        plt.suptitle('After Binary Mag Sobel', fontsize=14, fontweight='bold')
+        plt.imshow(binary_output)
+        plt.show()
+    # Return the binary image
+    return binary_output
+```
 ![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/5.png)
 
 ### 4. Sliding Window Detection
@@ -98,7 +157,31 @@ Variables hold the positional history for both lanes and if the current detected
 
 This was key in helping to create a smooth detected lane in video. The possible downside is turns such as 90 degree turn or hairpin turns may be too sharp for the function to handle, considering it an error. But for this purpose we are just driving on a highway which has maximum curvature requirements that will not cause any issues here.
 
-![alt text](https://raw.githubusercontent.com/cipher982/HiFi-Lane-Tracking/master/media/writeup_images/9.png)
+```python
+    global left_fitx_hist, right_fitx_hist
+    #MY CODE: Build left fit history in order to identify outliers
+    if left_fitx_hist==None:
+        left_fitx_hist=[]
+        left_fitx_hist.append(left_fitx)
+    else:
+        if abs((np.mean(np.mean(np.array(left_fitx_hist), axis=0 ))) - np.mean(left_fitx))<50:
+            if len(left_fitx_hist)>10:
+                left_fitx_hist=left_fitx_hist[1:]
+            left_fitx_hist.append(left_fitx)
+
+    #Build right fit history in order to identify outliers
+    if right_fitx_hist==None:
+        right_fitx_hist=[]
+        right_fitx_hist.append(right_fitx)
+    else:
+        if abs((np.mean(np.mean(np.array(right_fitx_hist), axis=0 ))) - np.mean(right_fitx))<50:
+            if len(right_fitx_hist)>10:
+                right_fitx_hist=right_fitx_hist[1:]
+            right_fitx_hist.append(right_fitx)
+
+    left_fitx_mean = np.mean(np.array(left_fitx_hist), axis=0 )[:len(ploty)]
+    right_fitx_mean = np.mean(np.array(right_fitx_hist), axis=0 )[:len(ploty)]
+```
 
 ### 2. Future considerations
 
